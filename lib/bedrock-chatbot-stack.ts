@@ -6,7 +6,24 @@ import { ApiGatewayToLambda } from '@aws-solutions-constructs/aws-apigateway-lam
 import * as genai from '@cdklabs/generative-ai-cdk-constructs';
 import { NagSuppressions } from 'cdk-nag';
 
+/**
+ * AWS CDK Stack for deploying a Bedrock-powered chatbot application.
+ * 
+ * This stack creates:
+ * - A Lambda function that interfaces with Amazon Bedrock AI models
+ * - An API Gateway to expose the chatbot functionality via REST API
+ * - Necessary IAM permissions for Bedrock model access
+ * - CORS configuration for web frontend integration
+ * - CDK Nag suppressions for demo project compliance
+ */
 export class BedrockChatbotStack extends cdk.Stack {
+  /**
+   * Constructs a new BedrockChatbotStack.
+   * 
+   * @param scope - The scope in which to define this construct
+   * @param id - The scoped construct ID. Must be unique amongst siblings in the same scope
+   * @param props - Optional stack properties including environment configuration
+   */
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -29,7 +46,26 @@ bedrock_runtime = boto3.client('bedrock-runtime', region_name=os.environ.get('AW
 
 def handler(event, context):
     """
-    Lambda function to handle chatbot requests using Amazon Bedrock
+    AWS Lambda function handler for processing chatbot requests using Amazon Bedrock.
+    
+    This function:
+    1. Parses incoming HTTP requests from API Gateway
+    2. Extracts user messages from the request body
+    3. Formats prompts for the Claude AI model
+    4. Invokes Amazon Bedrock with the user's message
+    5. Returns the AI response with proper CORS headers
+    
+    Args:
+        event (dict): AWS Lambda event object containing request data from API Gateway
+        context (object): AWS Lambda context object with runtime information
+        
+    Returns:
+        dict: HTTP response object with statusCode, headers, and JSON body containing:
+            - On success: AI response and model information
+            - On error: Error message and details
+            
+    Raises:
+        Exception: Any errors during Bedrock invocation or request processing
     """
     try:
         # Parse the request body
